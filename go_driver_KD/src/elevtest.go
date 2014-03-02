@@ -6,7 +6,7 @@ import (
     //"os"
 )
 
-const FLOORS = 4
+//const FLOORS = 4
 
 func main() {
 
@@ -22,23 +22,21 @@ func main() {
                     nil,
                     nil)    // not listening to obstruction switch and stop button events
 
-
-   for {
-      fmt.Printf("Started!\n")
-      elevdriver.SetMotorDir(elevdriver.NONE)
-     
-     } 
-      //elevdriver.SetButtonLight(1, elevdriver.UP, elevdriver.OFF)
+	fmt.Printf("Started!\n")
+	
+	elevdriver.SetDoorOpenLight(elevdriver.ON)
+	//go elevdriver.Poller(buttonEventChan, floorEventChan, nil, nil)
+	
       
-
-   
 /*
+   fmt.Println("hit")
+
     for {
         select {
         case btnPress := <- buttonEventChan:
                 fmt.Println("The", btnPress.Dir, "button on floor", btnPress.Floor, "has been pressed")
                 currButtonLights[btnPress.Floor][btnPress.Dir] = !currButtonLights[btnPress.Floor][btnPress.Dir]
-                elevdriver.SetButtonLight(btnPress.Floor, btnPress.Dir, currButtonLights[btnPress.Floor][btnPress.Dir])
+                elevdriver.SetButtonLight(btnPress.Floor, btnPress.Dir, elevdriver.ON)
 
         case newFloor := <- floorEventChan:
                 fmt.Println("Arrived at floor", newFloor)
@@ -51,11 +49,10 @@ func main() {
                 }
 
         case <- stopButtonEventChan:
-                fmt.Println("The stop button has been pressed. Exiting.")
+                fmt.Println("The stop button has been pressed.")
                 os.Exit(0)
         }
     }
-    
     */
 }
 

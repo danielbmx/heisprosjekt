@@ -2,8 +2,8 @@ package elevdriver
 import "fmt"
 import "time"
 
+// Direction
 type Direction int
-
 const (
     NONE Direction = iota
     UP
@@ -11,21 +11,26 @@ const (
 )
 var prevDir Direction = NONE
 
+// Light Value (ON/OFF)
 type LightVal int
 const (
     ON LightVal = iota
     OFF
 )
 
+
+// Button type
 type Button struct {
     Floor int
     Dir Direction
 }
 
-
+// Speed
 const MAX_SPEED = 4024
 const MIN_SPEED = 2048
 
+
+// Initialize system and drive car down to closest floor
 func Init(  buttonEventChan         chan Button,
             floorEventChan          chan int,
             stopButtonEventChan     chan bool,
@@ -38,18 +43,37 @@ func Init(  buttonEventChan         chan Button,
         fmt.Printf("Driver not initiated\n")
     }
 
-
-    go poller(  buttonEventChan,
+    go Poller(  buttonEventChan,
                 floorEventChan,
                 stopButtonEventChan,
                 obstructionEventChan)
+    
+
+ 
+    // Drive down to nearest floor and stop
+    
+    for <-floorEventChan == -1{
+    	SetMotorDir(DOWN)  
+    	fmt.Println("Hit2")  	
+    }
+    
+     
+    SetMotorDir(NONE)
+    
+    
+    
+    
+   
 }
 
-func poller(buttonEventChan         chan Button,
+
+// Polling channels every 50 ms
+func Poller(buttonEventChan         chan Button,
             floorEventChan          chan int,
             stopButtonEventChan     chan bool,
             obstructionEventChan    chan bool) {
-
+	
+	
     var floorMap = map[int] int {
         SENSOR1 : 0,
         SENSOR2 : 1,
@@ -70,10 +94,13 @@ func poller(buttonEventChan         chan Button,
         FLOOR_DOWN4    : { 4, DOWN },
     }
 
+
+	
     buttonList := make(map[int]bool)
     for key, _ := range buttonMap {
         buttonList[key] = Read_bit(key)
     }
+
 
     floorList := make(map[int]bool)
     for key, _ := range floorMap {
@@ -91,6 +118,8 @@ func poller(buttonEventChan         chan Button,
             if newValue != floorList[key] {
                 newFloor := floor
                 floorEventChan <- newFloor
+            }else{
+            	floorEventChan <- -1
             }
             floorList[key] = newValue
         }
@@ -119,7 +148,7 @@ func poller(buttonEventChan         chan Button,
 
 }
 
-
+// Sets motor direction
 func SetMotorDir(newDir Direction) {
     if (newDir == NONE) && (prevDir == UP) {
         Set_bit(MOTORDIR)
@@ -193,7 +222,7 @@ func SetButtonLight(floor int, dir Direction, onoff LightVal) {
     }
 }
 
-
+// Setting floor light
 func SetFloorLight(floor int) {
     switch floor {
     case 1:
@@ -211,7 +240,7 @@ func SetFloorLight(floor int) {
     }
 }
 
-
+// Setting Stop Button light
 func SetStopButtonLight(onoff LightVal) {
     switch {
     case onoff == ON:
@@ -221,7 +250,7 @@ func SetStopButtonLight(onoff LightVal) {
     }
 }
 
-
+// Setting Door Open lamp
 func SetDoorOpenLight(onoff LightVal) {
     switch {
     case onoff == ON:
