@@ -51,14 +51,18 @@ func Init(  buttonEventChan         chan Button,
 
  
     // Drive down to nearest floor and stop
+    if <-floorEventChan != -1 {
+    	return
+    }
     
     for <-floorEventChan == -1{
+    	time.Sleep(100*time.Millisecond)
     	SetMotorDir(DOWN)  
     	fmt.Println("Hit2")  	
     }
     
-     
-    SetMotorDir(NONE)
+    ElevatorStop(DOWN)
+
     
     
     
@@ -258,4 +262,20 @@ func SetDoorOpenLight(onoff LightVal) {
     case onoff == OFF:
         Clear_bit(DOOR_OPEN)
     }
+}
+
+
+func ElevatorStop(direction Direction) {
+	if direction == UP {
+		SetMotorDir(DOWN)
+		time.Sleep(8*time.Millisecond)
+		SetMotorDir(NONE)
+	}
+	if direction == DOWN {
+		SetMotorDir(UP)
+		time.Sleep(8*time.Millisecond)
+		SetMotorDir(NONE)
+	}else{
+		SetMotorDir(NONE)
+	}
 }
