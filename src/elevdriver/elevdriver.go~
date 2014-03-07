@@ -26,7 +26,7 @@ type Button struct {
 }
 
 // Speed
-const MAX_SPEED = 4024
+const MAX_SPEED = 3000
 const MIN_SPEED = 2048
 
 
@@ -42,28 +42,30 @@ func Init(  buttonEventChan         chan Button,
     } else {
         fmt.Printf("Driver not initiated\n")
     }
+    
+    SetMotorDir(STOP)
 
-    go Poller(  buttonEventChan,
+    Poller(  buttonEventChan,
                 floorEventChan,
                 stopButtonEventChan,
                 obstructionEventChan)
     
 
- 
+
     // Drive down to nearest floor and stop
     if <-floorEventChan != -1 {
     	return
     }
     
     for <-floorEventChan == -1{
-    	time.Sleep(10*time.Millisecond)
+    	time.Sleep(25*time.Millisecond)
     	SetMotorDir(DOWN)  
     	fmt.Println("Hit2")  	
     }
     
     ElevatorStop(DOWN)
 
-    
+
     
     
     
@@ -114,41 +116,61 @@ func Poller(buttonEventChan         chan Button,
     oldStop := false
     oldObs := false
 
-    for {
-        time.Sleep(50*time.Millisecond)
-        
-        for key, floor := range floorMap {
-            newValue := Read_bit(key)
-            if newValue != floorList[key] {
-                newFloor := floor
-                floorEventChan <- newFloor
-            }else{
-            	floorEventChan <- -1
+
+    go func(){
+    
+        for {
+            time.Sleep(25*time.Millisecond)
+            
+            for key, floor := range floorMap {
+                newValue := Read_bit(key)
+                if newValue != floorList[key] {
+                    newFloor := floor
+                    floorEventChan <- newFloor
+                }else{
+                	floorEventChan <- -1
+                }
+                floorList[key] = newValue
             }
-            floorList[key] = newValue
         }
+     }()
 
-        for key, btn := range buttonMap {
-            newValue := Read_bit(key)
-            if newValue && !buttonList[key] {
-                newButton := btn
-                buttonEventChan <- newButton
+    go func(){
+        for {
+            time.Sleep(25*time.Millisecond)
+            for key, btn := range buttonMap {
+                newValue := Read_bit(key)
+                if newValue && !buttonList[key] {
+                    newButton := btn
+                    buttonEventChan <- newButton
+                }
+                buttonList[key] = newValue
             }
-            buttonList[key] = newValue
         }
+    }()
 
-        newStop := Read_bit(STOP)
-        if newStop && !oldStop {
-            stopButtonEventChan <- true
+    go func(){
+        for {
+            time.Sleep(25*time.Millisecond)
+            newStop := Read_bit(STOP)
+            if newStop && !oldStop {
+                stopButtonEventChan <- true
+            }
+            oldStop = newStop
         }
-        oldStop = newStop
+    }()
 
-        newObs := Read_bit(OBSTRUCTION)
-        if newObs != oldObs {
-            obstructionEventChan <- newObs
+    go func(){
+        for {
+            time.Sleep(25*time.Millisecond)
+            newObs := Read_bit(OBSTRUCTION)
+            if newObs != oldObs {
+                obstructionEventChan <- newObs
+            }
+            oldObs = newObs
         }
-        oldObs = newObs
-    }
+    }()
+    
 
 }
 
