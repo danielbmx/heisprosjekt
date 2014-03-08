@@ -24,39 +24,32 @@ func main() {
 
     ch := make(chan int)
 
-    elevdriver.Init(nil, ch, nil, nil)
-    
-    go func(){
-        for {
-            fmt.Println("At floor", <-ch)
-        }
-    }()
-    
+    elevdriver.Init(nil, ch, nil, nil)    
 	
 	fmt.Println("main")
-	/*testbutton := elevdriver.Button{
+	testbutton := elevdriver.Button{
 		Floor : 2,
 		Dir : elevdriver.DOWN,
-	}*/
+	}
 	
-	message_chan := make(chan elevdriver.Button) 
+	// message_chan := make(chan elevdriver.Button) 
 	
-	//connection := UdpConnect()
+	connection := UdpConnect()
 	fmt.Println("connected")
 	
-	//UdpSender(testbutton, connection)
+	UdpSender(testbutton, connection)
 	fmt.Println("sent")
 	
 
-	knapp := elevdriver.Button{}
+	/*knapp := elevdriver.Button{}
 	go UdpReciver(message_chan)
 	fmt.Println("før knapp")
 	knapp = <- message_chan
 	fmt.Println("recieved")
 	fmt.Println(knapp)
 	
-	elevdriver.SetButtonLight(knapp.Floor, knapp.Dir, elevdriver.ON)
-	fmt.Println("ferdi")
+	elevdriver.SetButtonLight(knapp.Floor, knapp.Dir, elevdriver.OFF)
+	fmt.Println("ferdi")*/
 }
 
 // Recieve message via UDP

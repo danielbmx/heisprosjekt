@@ -194,8 +194,6 @@ func SetMotorDir(newDir Direction) {
     prevDir = newDir
 }
 
-
-// Fugly. Use arrays next time plz
 // SetOrderButtonLight()? Stop is also a button...
 func SetButtonLight(floor int, dir Direction, onoff LightVal) {
     switch onoff {
