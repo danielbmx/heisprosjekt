@@ -49,8 +49,7 @@ func Init(  buttonEventChan         chan Button,
                 floorEventChan,
                 stopButtonEventChan,
                 obstructionEventChan)
-    
-
+                
 
     // Drive down to nearest floor and stop
     if <-floorEventChan != -1 {
@@ -64,11 +63,6 @@ func Init(  buttonEventChan         chan Button,
     }
     
     ElevatorStop(DOWN)
-
-
-    
-    
-    
    
 }
 
@@ -194,8 +188,6 @@ func SetMotorDir(newDir Direction) {
     prevDir = newDir
 }
 
-
-// Fugly. Use arrays next time plz
 // SetOrderButtonLight()? Stop is also a button...
 func SetButtonLight(floor int, dir Direction, onoff LightVal) {
     switch onoff {

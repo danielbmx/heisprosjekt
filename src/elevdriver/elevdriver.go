@@ -30,47 +30,6 @@ const MAX_SPEED = 3000
 const MIN_SPEED = 2048
 
 
-// Initialize system and drive car down to closest floor
-func Init(  buttonEventChan         chan Button,
-            floorEventChan          chan int,
-            stopButtonEventChan     chan bool,
-            obstructionEventChan    chan bool){
-
-    val := IoInit()
-    if !val {
-        fmt.Printf("Driver initiated\n")
-    } else {
-        fmt.Printf("Driver not initiated\n")
-    }
-    
-    SetMotorDir(STOP)
-
-    Poller(  buttonEventChan,
-                floorEventChan,
-                stopButtonEventChan,
-                obstructionEventChan)
-    
-
-
-    // Drive down to nearest floor and stop
-    if <-floorEventChan != -1 {
-    	return
-    }
-    
-    for <-floorEventChan == -1{
-    	time.Sleep(25*time.Millisecond)
-    	SetMotorDir(DOWN)  
-    	fmt.Println("Hit2")  	
-    }
-    
-    ElevatorStop(DOWN)
-
-
-    
-    
-    
-   
-}
 
 
 // Polling channels every 50 ms
