@@ -1,9 +1,11 @@
 // State Machine 
 
-package "./elevdriver"
+package elevdriver
+
+
 import "fmt"
 import "time"
-import "ordersystem.go"
+import "./networkmodule" //should not be here. 
 
 
 // States
@@ -37,7 +39,7 @@ var event Event
 // channels for listening:
 var ButtonEventChan      = make(chan elevdrive.Direction)
 var FloorEventChan       = make(chan int)
-var DirEventChan         = make (chan elevdriver.Direction)
+var DirEventChan         = make (chan Direction)
 
 
 func UpdateState() State{
@@ -69,13 +71,12 @@ func UpdateState() State{
                     Stop car
                     Setmot
                     Open door for 3 sec
-                    Delete this order from queue
+                    Delete this order from queue HAPPENDS IN ORDERSYSTEM!
                     current state = STANDSTILL
                     */ 
-                    elevdriver.SetMotorDir(elevdriver.NONE)
-                    elevdriver.SetDoorOpenLight(elevdriver.ON)
+                    SetMotorDir(NONE)
+                    SetDoorOpenLight(ON)
                     timeStart = time.NOW()
-                    DeleteOrder(<-ButtonEventChan, ordersystem.OrderChan)
                     currentState = STANDSTILL
                     
                     
@@ -89,28 +90,28 @@ func UpdateState() State{
                     Close door if door has been open for more than 3 sec
                     */
                     if time.Now() >= timeStart.Add(3*time.Second){
-                        elevdriver.SetDoorOpenLight(elevdriver.OFF)
+                        SetDoorOpenLight(OFF)
                         }
                 case MOVE:
                     /*
                     move car in right direction
                     current state = MOVING
                     */
-                    elevdriver.SetMotorDir(<-DirEventChan)
+                    SetMotorDir(<-DirEventChan)
                     currentState = MOVE
                 
                 case HALT:
                     /*
                     Open door
-                    queue_delete_order(dir,last_floor)
+                    
                     */
-                    elevdriver.SetDoorOpenLight(elevdriver.ON)
+                    SetDoorOpenLight(ON)
                     
     }
 
 }
 
-func GetNextEvent(state State, floorEventChan chan elevdriver.Floor) Event{
+func GetNextEvent(state State, floorEventChan chan Floor) Event{
     switch(state){
     
         case INVALID:
@@ -134,9 +135,9 @@ func GetNextEvent(state State, floorEventChan chan elevdriver.Floor) Event{
 }
 
 // Initialize system and drive car down to closest floor
-func Init(  buttonEventChan         chan elevdriver.Button,
+func Init(  buttonEventChan         chan Button,
             floorEventChan          chan int,
-            dirEventChan            chan elevdriver.Direction){
+            dirEventChan            chan Direction){
 
     // Check if hardware can be initialized:
     val := IoInit()
@@ -147,9 +148,9 @@ func Init(  buttonEventChan         chan elevdriver.Button,
     }
     
     
-    elevdriver.SetMotorDir(elevdriver.NONE)
+    SetMotorDir(NONE)
 
-    elevdriver.Poller(  buttonEventChan,
+    Poller(  buttonEventChan,
                         floorEventChan)
                 
 
@@ -160,16 +161,16 @@ func Init(  buttonEventChan         chan elevdriver.Button,
     
     for <-floorEventChan == -1{
     	time.Sleep(25*time.Millisecond)
-    	SetMotorDir(elevdriver.DOWN)  
+    	SetMotorDir(DOWN)  
     	fmt.Println("Hit2")  	
     }
     
-    elevdriver.ElevatorStop(elevdriver.DOWN)
+    ElevatorStop(DOWN)
  
     // Initialize FSM variables:
     //last_floor:=<-floorEventChan
     
-    dirEventChan <- elevdriver.NONE
+    dirEventChan <- NONE
     
     
     //

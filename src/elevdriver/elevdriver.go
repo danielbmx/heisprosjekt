@@ -1,5 +1,6 @@
 package elevdriver
-import "fmt"
+
+//import "fmt"
 import "time"
 
 // Direction
@@ -34,9 +35,7 @@ const MIN_SPEED = 2048
 
 // Polling channels every 50 ms
 func Poller(buttonEventChan         chan Button,
-            floorEventChan          chan int,
-            stopButtonEventChan     chan bool,
-            obstructionEventChan    chan bool) {
+            floorEventChan          chan int,) {
 	
 	
     var floorMap = map[int] int {
@@ -108,28 +107,6 @@ func Poller(buttonEventChan         chan Button,
         }
     }()
 
-    go func(){
-        for {
-            time.Sleep(25*time.Millisecond)
-            newStop := Read_bit(STOP)
-            if newStop && !oldStop {
-                stopButtonEventChan <- true
-            }
-            oldStop = newStop
-        }
-    }()
-
-    go func(){
-        for {
-            time.Sleep(25*time.Millisecond)
-            newObs := Read_bit(OBSTRUCTION)
-            if newObs != oldObs {
-                obstructionEventChan <- newObs
-            }
-            oldObs = newObs
-        }
-    }()
-    
 
 }
 

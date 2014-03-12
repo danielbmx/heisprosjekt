@@ -1,11 +1,12 @@
 // Network module
 package main
+// should be package networkmodule
 import (
 	"fmt"
 	"net"
 	"time"
 	"encoding/json"
-	"./elevdriver"
+	elevdriver "../elevdriver"
 ) 
 /*
 // Confirm elevator order taken to other elevators in the network
@@ -53,7 +54,7 @@ func main() {
 }
 
 // Recieve message via UDP
-func UdpReciver(message_channel chan elevdriver.Button) {
+func UdpButtonReciver(message_channel chan elevdriver.Button) {
     
     serverAddr_udp, err := net.ResolveUDPAddr("udp", ":20005")
 	PrintError(err)
@@ -78,6 +79,7 @@ func UdpReciver(message_channel chan elevdriver.Button) {
     
 }
 
+
 // Create UDP connection
 func UdpConnect() *net.UDPConn{
 	serverAddr_udp, err := net.ResolveUDPAddr("udp", "129.241.187.255:20005")
@@ -93,7 +95,7 @@ func UdpConnect() *net.UDPConn{
 
 
 // Broadcast message via UDP using Json
-func UdpSender(parameter elevdriver.Button, con_udp *net.UDPConn) {
+func UdpButtonSender(parameter elevdriver.Button, con_udp *net.UDPConn) {
     fmt.Println("in udpSender")
     message, err := json.Marshal(parameter) 
     PrintError(err)
