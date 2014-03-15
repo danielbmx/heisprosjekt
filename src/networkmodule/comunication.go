@@ -21,41 +21,6 @@ func PassOrder() {
 
 */
 
-/*
-// main function for testing JSON package sending:
-func main() {
-
-    ch := make(chan int)
-
-    elevdriver.Init(nil, ch, nil, nil)    
-	
-	fmt.Println("main")
-	testbutton := elevdriver.Button{
-		Floor : 2,
-		Dir : elevdriver.DOWN,
-	}
-	
-	// message_chan := make(chan elevdriver.Button) 
-	
-	connection := UdpConnect()
-	fmt.Println("connected")
-	
-	UdpSender(testbutton, connection)
-	fmt.Println("sent")
-	
-
-	/*knapp := elevdriver.Button{}
-	go UdpReciver(message_chan)
-	fmt.Println("før knapp")
-	knapp = <- message_chan
-	fmt.Println("recieved")
-	fmt.Println(knapp)
-	
-	elevdriver.SetButtonLight(knapp.Floor, knapp.Dir, elevdriver.OFF)
-	fmt.Println("ferdi")
-}
-
-*/
 
 // Recieve message via UDP
 func UdpButtonReciver(message_channel chan elevdriver.Button) {
@@ -71,10 +36,8 @@ func UdpButtonReciver(message_channel chan elevdriver.Button) {
 	//PrintError(err)
 	
 	for {
-	    fmt.Println("hit2") 
-        n, _,_ := con_udp.ReadFromUDP(buffer)
-        fmt.Println("hit") 
-        //PrintError(err)
+        n, _,err := con_udp.ReadFromUDP(buffer)
+        PrintError(err)
         
         err1 := json.Unmarshal(buffer[0:n],&save)
         PrintError(err1)
@@ -85,8 +48,8 @@ func UdpButtonReciver(message_channel chan elevdriver.Button) {
 
 
 // Create UDP connection
-func UdpConnect() *net.UDPConn{
-	serverAddr_udp, err := net.ResolveUDPAddr("udp", "129.241.187.255:20005")
+func UdpConnect(address string) *net.UDPConn{
+	serverAddr_udp, err := net.ResolveUDPAddr("udp", address)
 	PrintError(err)
 
     con_udp, err := net.DialUDP("udp", nil, serverAddr_udp)
@@ -94,6 +57,7 @@ func UdpConnect() *net.UDPConn{
     
     return con_udp
 }
+
 
 
 
@@ -114,7 +78,7 @@ func UdpButtonSender(parameter elevdriver.Button, con_udp *net.UDPConn) {
 
 func UdpAliveReciver(message_alive chan int) {
     
-    serverAddr_udp, err := net.ResolveUDPAddr("udp", ":20005")
+    serverAddr_udp, err := net.ResolveUDPAddr("udp", ":20006")
 	PrintError(err)
 
     con_udp, err := net.ListenUDP("udp", serverAddr_udp)
@@ -125,9 +89,7 @@ func UdpAliveReciver(message_alive chan int) {
 	//PrintError(err)
 	
 	for {
-	    fmt.Println("hit2") 
         n, _,_ := con_udp.ReadFromUDP(buffer)
-        fmt.Println("hit") 
         //PrintError(err)
         
         err1 := json.Unmarshal(buffer[0:n],&save)

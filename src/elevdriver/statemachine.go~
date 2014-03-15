@@ -2,9 +2,10 @@
 
 package elevdriver
 
+import ("time"
+		"fmt"
+		)
 
-import "fmt"
-import "time"
 
 
 // States
@@ -30,148 +31,122 @@ const(
 
 
 // Private variables:
-var last_floor = make(chan int)
+var last_floor = make(chan int, 1)
 var timeStart time.Time
-//var currentState State
-//var event Event
+var currentState State = INVALID
+var event Event
+
 
 // channels for listening:
-var ButtonEventChan      = make(chan Button)
-var FloorEventChan       = make(chan int)
-var DirEventChan         = make(chan Direction)
+var ButtonEventChan      = make(chan Button, 10)
+var FloorEventChan       = make(chan int, 10)
+var DirEventChan         = make(chan Direction, 1)
 
-/*
-func UpdateState() { // State{
-    event := GetNextEvent(currentState, FloorEventChan)
-    switch currentState {
-        case INVALID:
-             switch event {
-                case INITIALIZE:
-                    Init(ButtonEventChan, FloorEventChan, DirEventChan)
-                case NOEVENT:
-                    break 
-                case MOVE:
-                    break 
-                case HALT:
-                    break 
-                    }
-        
-        case MOVING:
-            switch event {
-                case INITIALIZE:
-                    break
-                case NOEVENT:
-                    break 
-                case MOVE:
-                    break 
-                case HALT:
-                    
-                    //Stop car
-                    //Setmot
-                    //Open door for 3 sec
-                    //Delete this order from queue HAPPENDS IN ORDERSYSTEM!
-                    //current state = STANDSTILL
-                    
-                    SetMotorDir(NONE)
-                    SetDoorOpenLight(ON)
-                    timeStart = time.Now()
-                    currentState = STANDSTILL
-                    }
-                    
-        case STANDSTILL:
-            switch event {
-                case INITIALIZE:
-                    break
-                case NOEVENT:
-                    
-                    //Close door if door has been open for more than 3 sec
-                    
-                    closeTime := time.Now()
-                    if closeTime.Sub(timeStart) > 3 {
-                        SetDoorOpenLight(OFF)
-                        }
-                case MOVE:
-                    
-                    //move car in right direction
-                    //current state = MOVING
-                    
-                    SetMotorDir(<-DirEventChan)
-                    currentState = MOVE
-                
-                case HALT:
-                    
-                    //Open door
-                    
-                    SetDoorOpenLight(ON)
-           }
+
+func UpdateState() { 
+	for {
+/**/
+		time.Sleep(10*time.Millisecond)
+/**/	
+		event := GetNextEvent(currentState, FloorEventChan)
+		fmt.Println("State:", currentState, "  Event:", event)
+		switch currentState {
+		    case INVALID:
+		         switch event {
+		            case INITIALIZE:
+		            	DirEventChan <- NONE
+		                Init(ButtonEventChan, FloorEventChan)
+		                currentState = STANDSTILL
+		                fmt.Println("INVALID-INITIALIZE")
+		            case NOEVENT:
+		                break 
+		            case MOVE:
+		                break 
+		            case HALT:
+		                break 
+		                }
+		    
+		    case MOVING:
+		        switch event {
+		            case INITIALIZE:
+		                break
+		            case NOEVENT:
+		                break 
+		            case MOVE:
+		                break 
+		            case HALT:
+		                
+		                //Stop car
+		                //Setmot
+		                //Open door for 3 sec
+		                //Delete this order from queue HAPPENS IN ORDERSYSTEM!
+		                //current state = STANDSTILL
+		                
+		                SetMotorDir(NONE)
+		                SetDoorOpenLight(ON)
+		                timeStart = time.Now()
+		                currentState = STANDSTILL
+		                }
+		                
+		    case STANDSTILL:
+		        switch event {
+		            case INITIALIZE:
+		                break
+		            case NOEVENT:
+		                //Close door if door has been open for more than 3 sec
+		                closeTime := time.Now()
+		                if closeTime.Sub(timeStart) > 3 {
+		                    SetDoorOpenLight(OFF)
+		                    }
+		            case MOVE:
+		                //move car in right direction
+		                //current state = MOVING
+		                dir := 
+		                SetMotorDir(UP)
+		                time.Sleep(time.Second)
+		                SetMotorDir(NONE)
+		                currentState = MOVING
+		            
+		            case HALT:
+		                //Open door
+		                
+		                SetDoorOpenLight(ON)
+		       }
+		}
+	}
 }
-}
 
 
-func GetNextEvent(state State, floorEventChan chan Button.Floor) { //Event {
+func GetNextEvent(state State, floorEventChan chan int) Event { 
+    //fmt.Println("Inside GetNextEvent")
     switch currentState {
     
         case INVALID:
-        	// return INITIALIZE
+        	return INITIALIZE
         
         case MOVING:
         	// if should stop
-        	// return HALT 
+        	//return HALT 
         	
         	// if shoud continue moving
-        	// return NOEVENT    
+        	// return NOEVENT 
+        	return NOEVENT   
         
         case STANDSTILL:
-        	// if order in queue
-        	// return MOVE
+        	//if order in queue
+        	fmt.Println("Inside Standstill")
+        	return MOVE
         	
         	// if no order in queue
         	// return NOEVENT
+        default:
+        	fmt.Println("Returning NOEVENT")
+        	return NOEVENT
     }
 
 }
-*/
 
-// Initialize system and drive car down to closest floor
-func Init(  buttonEventChan         chan Button,
-            floorEventChan          chan int,
-            dirEventChan            chan Direction){
 
-    // Check if hardware can be initialized:
-    val := IoInit()
-    if !val {
-        fmt.Printf("Driver initiated\n")
-    } else {
-        fmt.Printf("Driver not initiated\n")
-    }
-    
-    
-    SetMotorDir(NONE)
-
-      
-   Poller(buttonEventChan, floorEventChan)
-                
-
-    // Drive down to nearest floor and stop
-    if <-floorEventChan != -1 {
-    	return
-    }
-    
-    for <-floorEventChan == -1{
-    	time.Sleep(25*time.Millisecond)
-    	SetMotorDir(DOWN)  
-    	fmt.Println("Hit2")  	
-    }
-    
-    ElevatorStop(DOWN)
- 
-    // Initialize FSM variables:
-    //last_floor:=<-floorEventChan
-    dirEventChan <- NONE
-    currentState := STANDSTILL
-    event := NOEVENT
-    
-}
 
 
 

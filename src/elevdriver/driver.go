@@ -1,6 +1,6 @@
 package elevdriver
 
-//import "fmt"
+import "fmt"
 import "time"
 
 // Direction
@@ -30,12 +30,55 @@ type Button struct {
 const MAX_SPEED = 3000
 const MIN_SPEED = 2048
 
+// Initialize system and drive car down to closest floor
+func Init(  buttonEventChan        chan Button,
+            floorEventChan          chan int,
+            //dirEventChan            chan Direction
+            ){
 
+    // Check if hardware can be initialized:
+    val := IoInit()
+    if !val {
+        fmt.Printf("Driver initiated\n")
+    } else {
+        fmt.Printf("Driver not initiated\n")
+    }
+    
+    // Clear all buttons lights
+    ClearButtons()
+    
+    SetMotorDir(NONE)
+
+   	Poller(buttonEventChan, floorEventChan)
+                
+
+    // Drive down to nearest floor and stop
+    if <-floorEventChan != -1 {
+    	return
+    }
+    
+    for <-floorEventChan == -1{
+    	time.Sleep(25*time.Millisecond)
+    	SetMotorDir(DOWN)  
+    		
+    }
+    
+    
+    ElevatorStop(DOWN)
+ 
+    // Initialize FSM variables:
+    //last_floor:=<-floorEventChan
+    //dirEventChan <- NONE
+    //currentState := STANDSTILL
+    //event := NOEVENT
+    fmt.Println("Out of init()")
+    
+}
 
 
 // Polling channels every 50 ms
 func Poller(buttonEventChan         chan Button,
-            floorEventChan          chan int,) {
+            floorEventChan          chan int) {
 	
 	
     var floorMap = map[int] int {
@@ -64,7 +107,6 @@ func Poller(buttonEventChan         chan Button,
     for key, _ := range buttonMap {
         buttonList[key] = Read_bit(key)
     }
-
 
     floorList := make(map[int]bool)
     for key, _ := range floorMap {
@@ -105,6 +147,7 @@ func Poller(buttonEventChan         chan Button,
                 buttonList[key] = newValue
             }
         }
+        
     }()
 
 
@@ -235,3 +278,42 @@ func ElevatorStop(direction Direction) {
 		SetMotorDir(NONE)
 	}
 }
+
+// clear buttons:
+func ClearButtons() {
+	SetDoorOpenLight(OFF)
+	for i := 1; i < 5; i++ {
+		SetButtonLight(i, NONE, OFF)
+		SetButtonLight(i, UP, OFF)
+		SetButtonLight(i, DOWN, OFF)
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -2,46 +2,153 @@ package main
 
 import ("./networkmodule"
         "./elevdriver"
-        "fmt")
+        "fmt"
+        "time")
 
 func main(){
    
-   fmt.Println("main")
-   
-   /*
-   // Declare channels
-    ButtonEventChan      := make(chan elevdriver.Button)
-    FloorEventChan       := make(chan int)
-   
-   
+   	fmt.Println("main")
+   	
+	go elevdriver.UpdateState()
+	
+	go networkmodule.HandleOrder(elevdriver.ButtonEventChan, networkmodule.OrderChannel)
+	//fmt.Println(<-networkmodule.OrderChannel)
+	
+	
+	//fmt.Println("Starting again")
+	
+   	//elevdriver.SetButtonLight(1, elevdriver.UP, elevdriver.ON)
+   	/*
+
     go elevdriver.Poller(buttonEventChan, floorEventChan)
     
     
     go HandleOrder()
    
+    */
+    /*
+    // Sender:
+    
+    testbutton := elevdriver.Button{1,1} 
+    testalive := 10
+    
+    connection1 := networkmodule.UdpConnect("129.241.187.255:20005") 
+    connection2 := networkmodule.UdpConnect("129.241.187.255:20006") 
+    
+    go networkmodule.UdpButtonSender(testbutton, connection1) 
+    
+    go networkmodule.UdpAliveSender(testalive, connection2)
+    
+    
+    
+    // Reciver:
+    
+    button_chan := make(chan elevdriver.Button) 
+    alive_chan := make(chan int)
+
+    knapp := elevdriver.Button{}
+    alive := 0
+    
+    
+    go networkmodule.UdpButtonReciver(button_chan)
+    go networkmodule.UdpAliveReciver(alive_chan)
+    
     for{
          select{
-            case ...
-            case ...
-         
-         
-         
+            case knapp = <- button_chan:
+            	fmt.Println(knapp)
+            	elevdriver.SetButtonLight(knapp.Floor, knapp.Dir, elevdriver.ON)
+            	
+            case alive = <- alive_chan:
+            	fmt.Println(alive)
+ 
         }
     }
-   */
-	//message_chan := make(chan elevdriver.Button) 
+    
+   
 	
-	knapp := elevdriver.Button{}
 	fmt.Println(knapp.Floor)
 	
-	/*
-	go UdpButtonReciver(message_chan)
 	fmt.Println("før knapp")
-	knapp = <- message_chan
-	fmt.Println("recieved")
-	fmt.Println(knapp)
 	
-	elevdriver.SetButtonLight(knapp.Floor, knapp.Dir, elevdriver.OFF)
+	fmt.Println("recieved")
+	
+	
 	fmt.Println("ferdi")
-	*/
+	*/	
+	for {
+		time.Sleep(10000*time.Hour)
+	}
 }
+
+
+func foo(get, set chan []int){
+
+	var arr []int
+
+	for {
+		select {
+			case get <- arr:
+			
+			case arr := <- set:
+		}
+	}
+}
+
+
+setter := make(chan []int)
+getter := make(chan []int)
+
+go foo(getter, setter)
+
+
+func bar(getter, setter chan []int){
+
+	data := <- getter
+	data := <- getter
+	// data
+	
+	setter <- data
+}
+
+
+func bar(getter chan []int){
+
+	data := <- getter
+	data := <- getter
+	// data
+	
+}
+
+
+
+func getButtonEventChanCopy(ButtonEventChan chan elevdriver.Button){
+	
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
