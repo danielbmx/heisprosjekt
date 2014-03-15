@@ -108,6 +108,42 @@ func UdpButtonSender(parameter elevdriver.Button, con_udp *net.UDPConn) {
 	}
 }
 
+func UdpAliveReciver(message_alive chan int) {
+    
+    serverAddr_udp, err := net.ResolveUDPAddr("udp", ":20005")
+	PrintError(err)
+
+    con_udp, err := net.ListenUDP("udp", serverAddr_udp)
+    PrintError(err)
+    save := '' 
+    buffer := make([]byte,1024)
+	//connection, err := net.ListenUDP("udp", UDP_addr)
+	//PrintError(err)
+	
+	for {
+	    fmt.Println("hit2") 
+        n, _,_ := con_udp.ReadFromUDP(buffer)
+        fmt.Println("hit") 
+        //PrintError(err)
+        
+        err1 := json.Unmarshal(buffer[0:n],&save)
+        PrintError(err1)
+        message_alive <- save
+    }
+}
+
+
+func UdpAliveSender(parameter int, con_udp *net.UDPConn) {
+    message, err := json.Marshal(parameter) 
+    PrintError(err)
+	
+	for {
+	fmt.Println("for in udpSender")
+		time.Sleep(1000 * time.Millisecond)
+		_, err2 := con_udp.Write(message)
+		PrintError(err2)
+	}
+}
 
 func PrintError(err error) {
 	if err != nil{

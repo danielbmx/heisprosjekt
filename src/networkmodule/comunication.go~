@@ -6,7 +6,7 @@ import (
 	"net"
 	"time"
 	"encoding/json"
-	"../elevdriver"
+	elevdriver "../elevdriver"
 ) 
 /*
 // Confirm elevator order taken to other elevators in the network
