@@ -117,8 +117,12 @@ func PrintError(err error) {
 	}
 }
 
-
-
+func OrderDecide(messageAlive chan int)
+	UdpAliveReciever(messageAlive)
+	cost1 := <-messageAlive
+	cost2 := <-messageAlive
+	if cost1 >= cost2 {
+		
 
 
 

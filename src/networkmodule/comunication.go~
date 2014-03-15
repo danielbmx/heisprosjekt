@@ -21,41 +21,6 @@ func PassOrder() {
 
 */
 
-/*
-// main function for testing JSON package sending:
-func main() {
-
-    ch := make(chan int)
-
-    elevdriver.Init(nil, ch, nil, nil)    
-	
-	fmt.Println("main")
-	testbutton := elevdriver.Button{
-		Floor : 2,
-		Dir : elevdriver.DOWN,
-	}
-	
-	// message_chan := make(chan elevdriver.Button) 
-	
-	connection := UdpConnect()
-	fmt.Println("connected")
-	
-	UdpSender(testbutton, connection)
-	fmt.Println("sent")
-	
-
-	/*knapp := elevdriver.Button{}
-	go UdpReciver(message_chan)
-	fmt.Println("før knapp")
-	knapp = <- message_chan
-	fmt.Println("recieved")
-	fmt.Println(knapp)
-	
-	elevdriver.SetButtonLight(knapp.Floor, knapp.Dir, elevdriver.OFF)
-	fmt.Println("ferdi")
-}
-
-*/
 
 // Recieve message via UDP
 func UdpButtonReciver(message_channel chan elevdriver.Button) {
@@ -152,8 +117,8 @@ func PrintError(err error) {
 	}
 }
 
-
-
+func OrderDecide(messageAlive chan int)
+	UdpAliveReciever(messageAlive)
 
 
 

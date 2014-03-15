@@ -81,7 +81,7 @@ func main(){
 	}
 }
 
-
+/*
 func foo(get, set chan []int){
 
 	var arr []int
@@ -132,7 +132,7 @@ func getButtonEventChanCopy(ButtonEventChan chan elevdriver.Button){
 
 
 
-
+*/
 
 
 

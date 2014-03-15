@@ -24,6 +24,7 @@ func InitOrderMatrix( orderchan chan [4][3]int) {
 func SaveOrder(buttonEventChan chan elevdriver.Button, orderchan chan [4][3]int){
 	for{
 		button := <-buttonEventChan
+		buttonEventChan <- button
 		ordermatrix := <- orderchan
 		ordermatrix[button.Floor][button.Dir] = 1
 		orderchan <- ordermatrix
@@ -34,8 +35,11 @@ func SaveOrder(buttonEventChan chan elevdriver.Button, orderchan chan [4][3]int)
 
 func CalculateCost(buttonEventChan chan elevdriver.Button, floorEventChan chan int, floorDirectionChan chan elevdriver.Direction) int{
 	dir := <- floorDirectionChan
+	floorDirectionChan <- dir
 	floor := <- floorEventChan
+	floorEventChan <- floor
 	button := <- buttonEventChan
+	buttonEventChan <- button
 	score := 0
 	if dir != button.Dir {
 		score += 1
@@ -89,13 +93,25 @@ func HandleOrder(buttonEventChan         chan elevdriver.Button,
 			time.Sleep(25*time.Millisecond)
 			
 			button := <- buttonEventChan
+			buttonEventChan <- button
 			ordermatrix := <- orderchan
 			ordermatrix[button.Floor][button.Dir] = 1
 			orderchan <- ordermatrix
+			UdpButtonSender(button, con_udp)
+			UdpButtonReciver(buttonEventChan)
+			for{
+         		select{
+            		case knapp = <- button_chan:
+            		fmt.Println(knapp)
+            		elevdriver.SetButtonLight(knapp.Floor, knapp.Dir, elevdriver.ON)
 		}
+		
+		
 	}()
 	
-	CalculateCost(buttonEventChan, floorEventChan)
+	
+	
+	// CalculateCost(buttonEventChan, floorEventChan)
 	
    
   
