@@ -1,11 +1,10 @@
 // Ordersystem
-package networkmodule
-
+package main
 import (
 	"fmt"
 	//"net"
 	"time"
-	elevdriver "../elevdriver"
+	"./elevdriver"
 ) 
 
 var OrderChannel = make(chan [4][3]int, 1)
@@ -71,24 +70,7 @@ func ResetOrder(elevator int, orderchan chan[4][3]int) {
 	}
 }
 
-func DeleteOrder(button elevdriver.Button, orderchan chan[4][3]int){
-   ordermatrix := <- orderchan
-   ordermatrix[button.Floor][button.Dir] = 0
-   orderchan <- ordermatrix
-}
 
-func HandleOrder(){
-   /*
-   Provide neccesary order-handling based on information from elevdriver via channels.
-   communication? 
-   */
-   
-   
-
-
-}
-
-/*
 func main() {
 
 go InitOrderMatrix(OrderChannel)
@@ -115,13 +97,18 @@ button<-testbutton3
 go SaveOrder(button, OrderChannel)
 
 
+
+
+
+
+
 time.Sleep(1*time.Second)
 fmt.Println(<-OrderChannel)
 
 }
 
 
-*/
+
 
 
 

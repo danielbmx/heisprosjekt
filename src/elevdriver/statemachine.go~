@@ -32,16 +32,16 @@ const(
 // Private variables:
 var last_floor = make(chan int)
 var timeStart time.Time
-var currentState State
-var event Event
+//var currentState State
+//var event Event
 
 // channels for listening:
 var ButtonEventChan      = make(chan Button)
 var FloorEventChan       = make(chan int)
 var DirEventChan         = make(chan Direction)
 
-
-func UpdateState() State{
+/*
+func UpdateState() { // State{
     event := GetNextEvent(currentState, FloorEventChan)
     switch currentState {
         case INVALID:
@@ -65,13 +65,13 @@ func UpdateState() State{
                 case MOVE:
                     break 
                 case HALT:
-                    /* 
-                    Stop car
-                    Setmot
-                    Open door for 3 sec
-                    Delete this order from queue HAPPENDS IN ORDERSYSTEM!
-                    current state = STANDSTILL
-                    */ 
+                    
+                    //Stop car
+                    //Setmot
+                    //Open door for 3 sec
+                    //Delete this order from queue HAPPENDS IN ORDERSYSTEM!
+                    //current state = STANDSTILL
+                    
                     SetMotorDir(NONE)
                     SetDoorOpenLight(ON)
                     timeStart = time.Now()
@@ -83,25 +83,25 @@ func UpdateState() State{
                 case INITIALIZE:
                     break
                 case NOEVENT:
-                    /*
-                    Close door if door has been open for more than 3 sec
-                    */
+                    
+                    //Close door if door has been open for more than 3 sec
+                    
                     closeTime := time.Now()
                     if closeTime.Sub(timeStart) > 3 {
                         SetDoorOpenLight(OFF)
                         }
                 case MOVE:
-                    /*
-                    move car in right direction
-                    current state = MOVING
-                    */
+                    
+                    //move car in right direction
+                    //current state = MOVING
+                    
                     SetMotorDir(<-DirEventChan)
                     currentState = MOVE
                 
                 case HALT:
-                    /*
-                    Open door
-                    */
+                    
+                    //Open door
+                    
                     SetDoorOpenLight(ON)
            }
 }
@@ -130,7 +130,7 @@ func GetNextEvent(state State, floorEventChan chan Button.Floor) { //Event {
     }
 
 }
-
+*/
 
 // Initialize system and drive car down to closest floor
 func Init(  buttonEventChan         chan Button,

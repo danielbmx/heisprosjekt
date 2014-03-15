@@ -1,8 +1,8 @@
 // Ordersystem
-package main
-// Should be package networkmodule
+package networkmodule
+
 import (
-	"fmt"
+	//"fmt"
 	//"net"
 	"time"
 	elevdriver "../elevdriver"
@@ -88,7 +88,7 @@ func HandleOrder(){
 
 }
 
-
+/*
 func main() {
 
 go InitOrderMatrix(OrderChannel)
@@ -121,7 +121,7 @@ fmt.Println(<-OrderChannel)
 }
 
 
-
+*/
 
 
 

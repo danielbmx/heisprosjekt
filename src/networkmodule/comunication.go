@@ -1,6 +1,6 @@
 // Network module
-package main
-// should be package networkmodule
+package networkmodule
+
 import (
 	"fmt"
 	"net"
@@ -18,8 +18,10 @@ func UdpConfirmOrder() {
 func PassOrder() {
 
 }
+
 */
 
+/*
 // main function for testing JSON package sending:
 func main() {
 
@@ -50,8 +52,10 @@ func main() {
 	fmt.Println(knapp)
 	
 	elevdriver.SetButtonLight(knapp.Floor, knapp.Dir, elevdriver.OFF)
-	fmt.Println("ferdi")*/
+	fmt.Println("ferdi")
 }
+
+*/
 
 // Recieve message via UDP
 func UdpButtonReciver(message_channel chan elevdriver.Button) {
@@ -115,7 +119,7 @@ func UdpAliveReciver(message_alive chan int) {
 
     con_udp, err := net.ListenUDP("udp", serverAddr_udp)
     PrintError(err)
-    save := '' 
+    save := 0
     buffer := make([]byte,1024)
 	//connection, err := net.ListenUDP("udp", UDP_addr)
 	//PrintError(err)

@@ -71,8 +71,8 @@ func Poller(buttonEventChan         chan Button,
         floorList[key] = Read_bit(key)
     }
 
-    //oldStop := false
-    //oldObs := false
+    oldStop := false
+    oldObs := false
 
 
     go func(){
