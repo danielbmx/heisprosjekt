@@ -116,13 +116,15 @@ func PrintError(err error) {
         fmt.Println(err)
 	}
 }
-
-func OrderDecide(messageAlive chan int)
+/*
+func OrderDecide(messageAlive chan int){
 	UdpAliveReciever(messageAlive)
 	cost1 := <-messageAlive
 	cost2 := <-messageAlive
-	if cost1 >= cost2 {
-		
+	if cost1 >= cost2 
+	
+}
+*/
 
 
 

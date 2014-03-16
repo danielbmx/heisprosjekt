@@ -8,9 +8,9 @@ import (
 	elevdriver "../elevdriver"
 ) 
 
-var OrderChannel = make(chan [4][3]int, 1)
 
-func InitOrderMatrix( orderchan chan [4][3]int) {
+
+func InitOrderMatrix(orderchan chan [4][3]int) {
 	var ordermatrix[4][3]int
 	
 	for i := 0; i<4; i++ {
@@ -26,7 +26,7 @@ func SaveOrder(buttonEventChan chan elevdriver.Button, orderchan chan [4][3]int)
 		button := <-buttonEventChan
 		buttonEventChan <- button
 		ordermatrix := <- orderchan
-		ordermatrix[button.Floor][button.Dir] = 1
+		ordermatrix[button.Floor - 1][button.Dir] = 1
 		orderchan <- ordermatrix
 		time.Sleep(50*time.Millisecond)
 	}
@@ -87,34 +87,23 @@ func HandleOrder(buttonEventChan         chan elevdriver.Button,
    Provide neccesary order-handling based on information from elevdriver via channels.
    communication? 
    */
-   go func(){
 		for{
 			fmt.Println("In handleOrder")
 			time.Sleep(25*time.Millisecond)
 			
 			button := <- buttonEventChan
 			buttonEventChan <- button
+			elevdriver.SetButtonLight(button.Floor, button.Dir, elevdriver.ON)
 			ordermatrix := <- orderchan
-			ordermatrix[button.Floor][button.Dir] = 1
+			ordermatrix[button.Floor - 1][button.Dir] = 1
+			fmt.Println(ordermatrix)
 			orderchan <- ordermatrix
-			UdpButtonSender(button, con_udp)
-			UdpButtonReciver(buttonEventChan)
-			for{
-         		select{
-            		case knapp = <- button_chan:
-            		fmt.Println(knapp)
-            		elevdriver.SetButtonLight(knapp.Floor, knapp.Dir, elevdriver.ON)
+			toemptybuttonChan := <- buttonEventChan
+			fmt.Println("trykket:  ", toemptybuttonChan)
 		}
-		
-		
-	}()
+			//UdpButtonSender(button, con_udp)
+			//UdpButtonReciver(buttonEventChan)
 	
-	
-	
-	// CalculateCost(buttonEventChan, floorEventChan)
-	
-   
-  
 }
 
 

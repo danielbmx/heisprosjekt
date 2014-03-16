@@ -9,6 +9,10 @@ func main(){
    
    	fmt.Println("main")
    	
+   	
+   	
+	networkmodule.InitOrderMatrix(OrderChannel)
+   	
 	go elevdriver.UpdateState()
 	
 	go networkmodule.HandleOrder(elevdriver.ButtonEventChan, networkmodule.OrderChannel)

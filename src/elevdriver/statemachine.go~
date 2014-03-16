@@ -38,8 +38,8 @@ var event Event
 
 
 // channels for listening:
-var ButtonEventChan      = make(chan Button, 10)
-var FloorEventChan       = make(chan int, 10)
+var ButtonEventChan      = make(chan Button, 1)
+var FloorEventChan       = make(chan int, 1)
 var DirEventChan         = make(chan Direction, 1)
 
 
@@ -48,8 +48,8 @@ func UpdateState() {
 /**/
 		time.Sleep(10*time.Millisecond)
 /**/	
-		event := GetNextEvent(currentState, FloorEventChan)
-		fmt.Println("State:", currentState, "  Event:", event)
+		event := GetNextEvent(currentState, FloorEventChan, networkmodule.OrderChannel)
+		//fmt.Println("State:", currentState, "  Event:", event)
 		switch currentState {
 		    case INVALID:
 		         switch event {
@@ -101,7 +101,6 @@ func UpdateState() {
 		            case MOVE:
 		                //move car in right direction
 		                //current state = MOVING
-		                dir := 
 		                SetMotorDir(UP)
 		                time.Sleep(time.Second)
 		                SetMotorDir(NONE)
@@ -117,7 +116,7 @@ func UpdateState() {
 }
 
 
-func GetNextEvent(state State, floorEventChan chan int) Event { 
+func GetNextEvent(currentState State, floorEventChan chan int, orderChan chan[4][3] int) Event { 
     //fmt.Println("Inside GetNextEvent")
     switch currentState {
     
@@ -126,7 +125,20 @@ func GetNextEvent(state State, floorEventChan chan int) Event {
         
         case MOVING:
         	// if should stop
-        	//return HALT 
+        	//return HALT
+        	
+        	// Read from orderChan
+        	matrix := <- orderChan
+        	orderChan <- matrix
+        	fmt.Println(matrix)
+        	
+        	// Read from FloorEventChan
+        	floor := <- FloorEventChan
+        	FloorEventChan <- floor
+        	fmt.Println(floor)
+        	// "Compare"
+        	
+        	
         	
         	// if shoud continue moving
         	// return NOEVENT 
