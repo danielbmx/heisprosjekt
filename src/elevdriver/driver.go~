@@ -31,10 +31,7 @@ const MAX_SPEED = 3000
 const MIN_SPEED = 2048
 
 // Initialize system and drive car down to closest floor
-func Init(  buttonEventChan        chan Button,
-            floorEventChan          chan int,
-            //dirEventChan            chan Direction
-            ){
+func Init (buttonEventChan chan Button, floorEventChan chan int, dirEventChan chan Direction){
 
     // Check if hardware can be initialized:
     val := IoInit()
@@ -48,16 +45,21 @@ func Init(  buttonEventChan        chan Button,
     ClearButtons()
     
     SetMotorDir(NONE)
-
+	floorEventChan <- -1
+	
    	Poller(buttonEventChan, floorEventChan)
-                
+    fmt.Println("floorEventChan <- -1")           
 
-    // Drive down to nearest floor and stop
+    
     if <-floorEventChan != -1 {
+    	dirEventChan <- NONE
+    	fmt.Println("Already at some floor")
     	return
     }
     
+    // Drive down to nearest floor and stop
     for <-floorEventChan == -1{
+    	fmt.Println("driving to nearest floor")
     	time.Sleep(25*time.Millisecond)
     	SetMotorDir(DOWN)  
     		
@@ -65,10 +67,10 @@ func Init(  buttonEventChan        chan Button,
     
     
     ElevatorStop(DOWN)
- 
+ 	
     // Initialize FSM variables:
     //last_floor:=<-floorEventChan
-    //dirEventChan <- NONE
+    dirEventChan <- NONE
     //currentState := STANDSTILL
     //event := NOEVENT
     fmt.Println("Out of init()")
@@ -107,7 +109,6 @@ func Poller(buttonEventChan         chan Button,
     for key, _ := range buttonMap {
         buttonList[key] = Read_bit(key)
     }
-	fmt.Println(buttonList)
 
     floorList := make(map[int]bool)
     for key, _ := range floorMap {

@@ -1,7 +1,8 @@
 package main
 
 import ("./networkmodule"
-        "./elevdriver"
+        //"./elevdriver"
+        "./statemachine"
         "fmt"
         "time")
 
@@ -9,13 +10,13 @@ func main(){
    
    	fmt.Println("main")
    	
-   	var OrderChannel = make(chan [4][3]int, 1)
    	
-	networkmodule.InitOrderMatrix(OrderChannel)
    	
-	go elevdriver.UpdateState()
+	networkmodule.InitOrderMatrix(networkmodule.OrderChannel)
+   	
+	go statemachine.UpdateState()
 	
-	go networkmodule.HandleOrder(elevdriver.ButtonEventChan, networkmodule.OrderChannel)
+	go networkmodule.HandleOrder(statemachine.ButtonEventChan, networkmodule.OrderChannel)
 	//fmt.Println(<-networkmodule.OrderChannel)
 	
 	

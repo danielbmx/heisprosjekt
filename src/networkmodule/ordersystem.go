@@ -81,8 +81,105 @@ func DeleteOrder(button elevdriver.Button, orderchan chan[4][3]int){
    orderchan <- ordermatrix
 }
 
-func HandleOrder(buttonEventChan         chan elevdriver.Button,
-				  orderchan 			 chan [4][3]int){
+
+
+func StopAtFloor(dirEventChan chan elevdriver.Direction, floorEventChan chan int, orderChan chan [4][3]int) bool {
+	//fmt.Println("inside StopAtFloor")
+	dir := <- dirEventChan
+	dirEventChan <- dir
+	
+	floor := <- floorEventChan
+	floorEventChan <- floor
+	//fmt.Println(floor)
+	matrix := <- orderChan
+	orderChan <- matrix
+	if floor == -1{
+		return false
+	}
+	if matrix[floor][dir] != 0 || matrix[floor][elevdriver.NONE] != 0 {
+		fmt.Println("true returned")
+		<-dirEventChan
+		dirEventChan <- elevdriver.NONE
+		return true
+	}else{
+		return false
+	}
+}
+
+
+func OrderAbove(floor int, ordermatrix [4][3]int) bool {
+
+	for floor+=1; floor < 4; floor++{
+		if ordermatrix[floor][elevdriver.NONE] != 0 || ordermatrix[floor][elevdriver.UP] != 0 || ordermatrix[floor][elevdriver.DOWN] != 0{
+			return true
+			}
+	}
+	return false
+
+}
+
+func OrderBelow(floor int, ordermatrix [4][3]int) bool {
+	
+	for floor-=1; floor >= 0; floor--{
+		if ordermatrix[floor][elevdriver.NONE]!=0 || ordermatrix[floor][elevdriver.UP]!=0 || ordermatrix[floor][elevdriver.DOWN]!=0{
+			return true
+			}
+	}
+	return false
+
+}
+
+func GetNextDirection(dirEventChan chan elevdriver.Direction, floorEventChan chan int, orderChan chan[4][3]int) {
+	
+	dir := <- dirEventChan
+	dirEventChan <- dir
+	
+	matrix := <- orderChan
+	orderChan <- matrix
+	
+	floor := <- floorEventChan
+	floorEventChan <- floor
+	
+	switch dir {
+		case elevdriver.NONE:
+			if OrderBelow(floor, matrix) {
+				<-dirEventChan
+				dirEventChan <- elevdriver.DOWN
+				
+			}
+			if OrderAbove(floor, matrix) {
+				<-dirEventChan
+				dirEventChan <- elevdriver.UP
+				
+			}
+		case elevdriver.UP:
+			if OrderAbove(floor, matrix) {
+				<-dirEventChan
+				dirEventChan <- elevdriver.UP
+				
+			}
+			if OrderBelow(floor, matrix) {
+				<-dirEventChan
+				dirEventChan <- elevdriver.DOWN
+				
+			}
+		case elevdriver.DOWN:
+			if OrderBelow(floor, matrix) {
+				<-dirEventChan
+				dirEventChan <- elevdriver.DOWN
+				
+			}
+			if OrderAbove(floor, matrix) {
+				<-dirEventChan
+				dirEventChan <- elevdriver.UP
+				
+			}
+
+	}
+	
+}
+
+func HandleOrder(buttonEventChan chan elevdriver.Button, orderchan chan [4][3]int){
    /*
    Provide neccesary order-handling based on information from elevdriver via channels.
    communication? 
@@ -93,12 +190,18 @@ func HandleOrder(buttonEventChan         chan elevdriver.Button,
 			
 			button := <- buttonEventChan
 			buttonEventChan <- button
+			
+			// Set lights
 			elevdriver.SetButtonLight(button.Floor, button.Dir, elevdriver.ON)
+			
+			// Push ordermatrix back to orderchan
 			ordermatrix := <- orderchan
+			orderchan <- ordermatrix
 			ordermatrix[button.Floor - 1][button.Dir] = 1
 			fmt.Println(ordermatrix)
 			orderchan <- ordermatrix
 			toemptybuttonChan := <- buttonEventChan
+			
 			fmt.Println("trykket:  ", toemptybuttonChan)
 		}
 			//UdpButtonSender(button, con_udp)
